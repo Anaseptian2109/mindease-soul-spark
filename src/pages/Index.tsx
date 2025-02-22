@@ -2,8 +2,11 @@
 import { motion } from "framer-motion";
 import { ChevronRight, Heart, Brain, Smile, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 const Index = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary">
       {/* Hero Section */}
@@ -23,7 +26,10 @@ const Index = () => {
           <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
             MindEase combines AI technology with proven mental health practices to help you manage stress, anxiety, and improve your overall wellbeing.
           </p>
-          <Button className="slide-up px-8 py-6 text-lg bg-primary hover:bg-primary/90">
+          <Button 
+            onClick={() => navigate("/onboarding")}
+            className="slide-up px-8 py-6 text-lg bg-primary hover:bg-primary/90"
+          >
             Get Started <ChevronRight className="ml-2 h-5 w-5" />
           </Button>
         </motion.div>
