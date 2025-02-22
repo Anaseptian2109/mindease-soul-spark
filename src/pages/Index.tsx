@@ -26,12 +26,21 @@ const Index = () => {
           <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
             MindEase combines AI technology with proven mental health practices to help you manage stress, anxiety, and improve your overall wellbeing.
           </p>
-          <Button 
-            onClick={() => navigate("/onboarding")}
-            className="slide-up px-8 py-6 text-lg bg-primary hover:bg-primary/90"
-          >
-            Get Started <ChevronRight className="ml-2 h-5 w-5" />
-          </Button>
+          <div className="space-x-4">
+            <Button 
+              onClick={() => navigate("/signup")}
+              className="slide-up px-8 py-6 text-lg bg-primary hover:bg-primary/90"
+            >
+              Get Started <ChevronRight className="ml-2 h-5 w-5" />
+            </Button>
+            <Button 
+              onClick={() => navigate("/signin")}
+              variant="outline"
+              className="slide-up px-8 py-6 text-lg"
+            >
+              Sign In
+            </Button>
+          </div>
         </motion.div>
       </section>
 
