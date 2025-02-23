@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -9,7 +8,7 @@ import {
   BarChart2, 
   Watch, 
   Droplet,
-  Lungs,
+  Wind,
   Footprints,
   Flame,
   Dumbbell,
@@ -132,7 +131,7 @@ const HealthMonitoring = () => {
               "mmHg"
             )}
             {renderMetricCard(
-              <Lungs className="h-6 w-6 text-blue-500" />,
+              <Wind className="h-6 w-6 text-blue-500" />,
               "Oxygen Saturation",
               healthData.spO2,
               "%"
