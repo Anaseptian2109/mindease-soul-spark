@@ -1,7 +1,7 @@
 
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Brain, Heart, Moon, Book, Users, Settings } from "lucide-react";
+import { Brain, Heart, Moon, Book, Users, Settings, Activity } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const DashboardCard = ({ 
@@ -32,6 +32,12 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   const features = [
+    {
+      title: "Health Monitoring",
+      description: "Track your physical and mental health metrics",
+      icon: Activity,
+      path: "/health-monitoring"
+    },
     {
       title: "AI Emotional Support",
       description: "Chat with our AI for emotional guidance and support",

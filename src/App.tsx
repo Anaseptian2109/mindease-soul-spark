@@ -19,6 +19,7 @@ import Meditation from "./pages/Meditation";
 import Journal from "./pages/Journal";
 import Community from "./pages/Community";
 import Settings from "./pages/Settings";
+import HealthMonitoring from "./pages/HealthMonitoring";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,7 @@ const App = () => (
             <Route path="/journal" element={<Journal />} />
             <Route path="/community" element={<Community />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/health-monitoring" element={<HealthMonitoring />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AnimatePresence>
