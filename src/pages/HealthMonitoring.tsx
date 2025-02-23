@@ -1,6 +1,8 @@
+
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 import { 
   Heart, 
   Moon, 
@@ -13,7 +15,8 @@ import {
   Flame,
   Dumbbell,
   Brain,
-  Share2
+  Share2,
+  Loader2
 } from "lucide-react";
 
 interface HealthData {
@@ -26,9 +29,12 @@ interface HealthData {
   steps: number;
   caloriesBurned: number;
   stressLevel: string;
+  lastUpdated: Date;
 }
 
 const HealthMonitoring = () => {
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(true);
   const [healthData, setHealthData] = useState<HealthData>({
     heartRate: 75,
     hrv: 65,
@@ -38,8 +44,63 @@ const HealthMonitoring = () => {
     spO2: 98,
     steps: 8542,
     caloriesBurned: 1850,
-    stressLevel: "Normal"
+    stressLevel: "Normal",
+    lastUpdated: new Date()
   });
+
+  useEffect(() => {
+    // Simulasi loading data
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+      toast({
+        title: "Data Updated",
+        description: "Your health metrics have been refreshed",
+      });
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Simulasi pembaruan data setiap 30 detik
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setHealthData(prev => ({
+        ...prev,
+        heartRate: Math.floor(70 + Math.random() * 20),
+        steps: prev.steps + Math.floor(Math.random() * 100),
+        caloriesBurned: prev.caloriesBurned + Math.floor(Math.random() * 50),
+        lastUpdated: new Date()
+      }));
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleExportData = () => {
+    try {
+      const dataStr = JSON.stringify(healthData, null, 2);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      const url = window.URL.createObjectURL(dataBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `health-data-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast({
+        title: "Export Successful",
+        description: "Your health data has been downloaded",
+      });
+    } catch (error) {
+      toast({
+        title: "Export Failed",
+        description: "Unable to export health data. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const renderMetricCard = (
     icon: React.ReactNode,
@@ -49,7 +110,7 @@ const HealthMonitoring = () => {
   ) => (
     <motion.div
       whileHover={{ y: -5 }}
-      className="bg-card rounded-lg p-6"
+      className="bg-card rounded-lg p-6 relative overflow-hidden"
     >
       <div className="flex items-center gap-3 mb-4">
         {icon}
@@ -59,8 +120,29 @@ const HealthMonitoring = () => {
         {value}
         {unit && <span className="text-lg text-muted-foreground ml-1">{unit}</span>}
       </div>
+      <motion.div
+        className="absolute bottom-0 left-0 h-1 bg-primary"
+        initial={{ width: "0%" }}
+        animate={{ width: "100%" }}
+        transition={{ duration: 2, repeat: Infinity }}
+      />
     </motion.div>
   );
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-center"
+        >
+          <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
+          <p className="text-lg text-muted-foreground">Loading your health data...</p>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -70,12 +152,17 @@ const HealthMonitoring = () => {
       className="min-h-screen bg-background p-8"
     >
       <div className="max-w-7xl mx-auto">
-        <div className="flex items-center gap-4 mb-8">
-          <Activity className="h-8 w-8 text-primary" />
-          <div>
-            <h1 className="text-4xl font-bold">Health Monitoring</h1>
-            <p className="text-muted-foreground">Track your physical and mental wellbeing</p>
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
+            <Activity className="h-8 w-8 text-primary" />
+            <div>
+              <h1 className="text-4xl font-bold">Health Monitoring</h1>
+              <p className="text-muted-foreground">Track your physical and mental wellbeing</p>
+            </div>
           </div>
+          <p className="text-sm text-muted-foreground">
+            Last updated: {healthData.lastUpdated.toLocaleTimeString()}
+          </p>
         </div>
 
         {/* Heart Rate & HRV Section */}
@@ -183,7 +270,11 @@ const HealthMonitoring = () => {
                 <Watch className="h-6 w-6 text-primary" />
                 <h2 className="text-xl font-semibold">Connected Devices</h2>
               </div>
-              <Button variant="outline" className="gap-2">
+              <Button 
+                variant="outline" 
+                className="gap-2"
+                onClick={handleExportData}
+              >
                 <Share2 className="h-4 w-4" />
                 Export Data
               </Button>
