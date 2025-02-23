@@ -1,11 +1,51 @@
 
 import { motion } from "framer-motion";
-import { ChevronRight, Heart, Brain, Smile, Moon, Activity } from "lucide-react";
+import { ChevronRight, Heart, Brain, Moon, Activity, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
+import { useState, useEffect } from "react";
 
 const Index = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate loading state
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleGetStarted = () => {
+    try {
+      navigate("/signup");
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Unable to proceed. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-background to-secondary flex items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-center"
+        >
+          <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
+          <p className="text-lg text-muted-foreground">Loading amazing features...</p>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary">
@@ -28,7 +68,7 @@ const Index = () => {
           </p>
           <div className="space-x-4">
             <Button 
-              onClick={() => navigate("/signup")}
+              onClick={handleGetStarted}
               className="slide-up px-8 py-6 text-lg bg-primary hover:bg-primary/90"
             >
               Get Started <ChevronRight className="ml-2 h-5 w-5" />
@@ -75,7 +115,7 @@ const Index = () => {
         </motion.div>
       </section>
 
-      {/* New Health Monitoring Section */}
+      {/* Health Monitoring Section */}
       <section className="container px-4 py-20 bg-card rounded-lg my-8">
         <div className="max-w-4xl mx-auto">
           <motion.div
@@ -108,6 +148,54 @@ const Index = () => {
             />
           </div>
         </div>
+      </section>
+
+      {/* Trust and Security Section */}
+      <section className="container px-4 py-20">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.6 }}
+          className="text-center max-w-3xl mx-auto"
+        >
+          <h2 className="text-3xl font-bold mb-6">Your Privacy & Security Matter</h2>
+          <p className="text-lg text-muted-foreground mb-8">
+            We use industry-standard encryption and security measures to protect your data. 
+            Your health information is private and secure with us.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+            <div className="p-6">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                className="rounded-full bg-primary/10 w-16 h-16 flex items-center justify-center mx-auto mb-4"
+              >
+                <Shield className="h-8 w-8 text-primary" />
+              </motion.div>
+              <h3 className="font-semibold mb-2">End-to-End Encryption</h3>
+              <p className="text-sm text-muted-foreground">Your data is encrypted at rest and in transit</p>
+            </div>
+            <div className="p-6">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                className="rounded-full bg-primary/10 w-16 h-16 flex items-center justify-center mx-auto mb-4"
+              >
+                <Lock className="h-8 w-8 text-primary" />
+              </motion.div>
+              <h3 className="font-semibold mb-2">HIPAA Compliant</h3>
+              <p className="text-sm text-muted-foreground">Meeting healthcare privacy standards</p>
+            </div>
+            <div className="p-6">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                className="rounded-full bg-primary/10 w-16 h-16 flex items-center justify-center mx-auto mb-4"
+              >
+                <UserCheck className="h-8 w-8 text-primary" />
+              </motion.div>
+              <h3 className="font-semibold mb-2">User Control</h3>
+              <p className="text-sm text-muted-foreground">Full control over your data sharing preferences</p>
+            </div>
+          </div>
+        </motion.div>
       </section>
     </div>
   );
