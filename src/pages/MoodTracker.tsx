@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -282,19 +281,21 @@ const MoodTracker = () => {
                 onSelect={(date) => date && setDate(date)}
                 className="rounded-md border"
                 components={{
-                  Day: ({ day }) => (
-                    <div className="relative flex h-9 w-9 items-center justify-center">
-                      <div className="absolute">
-                        {day.date.toDateString() === date.toDateString() && (
-                          <div className="absolute inset-0 rounded-full border-2 border-primary" />
-                        )}
+                  DayContent: ({ date: dayDate, ...props }) => {
+                    return (
+                      <div className="relative flex h-9 w-9 items-center justify-center">
+                        <div className="absolute">
+                          {dayDate && dayDate.toDateString() === date.toDateString() && (
+                            <div className="absolute inset-0 rounded-full border-2 border-primary" />
+                          )}
+                        </div>
+                        <div>{dayDate ? dayDate.getDate() : null}</div>
+                        <div className="absolute bottom-1">
+                          {renderDay(dayDate)}
+                        </div>
                       </div>
-                      <div>{day.day}</div>
-                      <div className="absolute bottom-1">
-                        {renderDay(day.date)}
-                      </div>
-                    </div>
-                  ),
+                    );
+                  },
                 }}
               />
             </div>
