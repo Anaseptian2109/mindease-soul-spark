@@ -1,649 +1,894 @@
 
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { 
-  Settings as SettingsIcon, 
-  Bell, 
-  Moon, 
-  Shield, 
-  User, 
-  LogOut, 
-  Save, 
-  Clock, 
-  Download,
-  Laptop,
-  Globe,
-  Pencil,
-  CheckCircle,
-  Languages,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from "@/components/ui/alert-dialog";
+import {
+  Bell,
+  Brush,
   Lock,
-  Eye,
-  Trash2
+  LogOut,
+  Moon,
+  Settings as SettingsIcon,
+  Shield,
+  Sun,
+  User,
+  Languages,
+  X,
+  Smartphone,
+  KeySquare,
+  Cloud,
+  Download,
+  History
 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
 
-interface UserSettings {
-  name: string;
+type ThemeOption = "light" | "dark" | "system";
+type LanguageOption = "en" | "id" | "es" | "fr" | "de";
+
+interface UserProfile {
+  fullName: string;
   email: string;
+  phone: string;
   bio: string;
-  notifications: boolean;
-  dailyReminders: boolean;
-  weeklyReports: boolean;
-  darkMode: boolean;
-  dataSharing: boolean;
-  language: string;
-  timezone: string;
-  privacyLevel: string;
-  sessionDuration: number;
-  avatarUrl: string;
+  avatar: string;
 }
 
-const languages = [
-  { value: "en", label: "English" },
-  { value: "id", label: "Bahasa Indonesia" },
-  { value: "es", label: "Español" },
-  { value: "fr", label: "Français" },
-  { value: "de", label: "Deutsch" },
-  { value: "zh", label: "中文" },
-  { value: "ja", label: "日本語" },
-];
+interface NotificationSettings {
+  email: boolean;
+  push: boolean;
+  sms: boolean;
+  inApp: boolean;
+  marketing: boolean;
+}
 
-const timezones = [
-  { value: "UTC+0", label: "UTC+0 (London, Lisbon)" },
-  { value: "UTC+1", label: "UTC+1 (Berlin, Paris, Rome)" },
-  { value: "UTC+2", label: "UTC+2 (Athens, Cairo)" },
-  { value: "UTC+3", label: "UTC+3 (Moscow, Istanbul)" },
-  { value: "UTC+7", label: "UTC+7 (Jakarta, Bangkok)" },
-  { value: "UTC+8", label: "UTC+8 (Singapore, Beijing)" },
-  { value: "UTC+9", label: "UTC+9 (Tokyo, Seoul)" },
-  { value: "UTC-5", label: "UTC-5 (New York, Toronto)" },
-  { value: "UTC-8", label: "UTC-8 (Los Angeles, Vancouver)" },
-];
+interface AppSettings {
+  theme: ThemeOption;
+  language: LanguageOption;
+  autoSaveJournal: boolean;
+  compactView: boolean;
+}
 
-const privacyLevels = [
-  { value: "public", label: "Public" },
-  { value: "friends", label: "Friends Only" },
-  { value: "private", label: "Private" },
-];
+interface PrivacySettings {
+  showOnlineStatus: boolean;
+  shareProgress: boolean;
+  allowDataAnalysis: boolean;
+  twoFactorAuth: boolean;
+}
 
 const Settings = () => {
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState<'profile' | 'notifications' | 'appearance' | 'privacy' | 'sessions' | 'advanced'>('profile');
-  const [settings, setSettings] = useState<UserSettings>(() => {
-    const savedSettings = localStorage.getItem('userSettings');
-    if (savedSettings) {
-      return JSON.parse(savedSettings);
-    }
-    return {
-      name: "John Doe",
-      email: "john@example.com",
-      bio: "I'm focused on improving my mental wellbeing through mindfulness and meditation.",
-      notifications: true,
-      dailyReminders: false,
-      weeklyReports: true,
-      darkMode: false,
-      dataSharing: true,
-      language: "en",
-      timezone: "UTC+7",
-      privacyLevel: "friends",
-      sessionDuration: 20,
-      avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=John"
-    };
+  const [activeTab, setActiveTab] = useState("profile");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  
+  // Initial data states
+  const [profile, setProfile] = useState<UserProfile>({
+    fullName: "John Doe",
+    email: "john.doe@example.com",
+    phone: "+1 (555) 123-4567",
+    bio: "I'm focusing on improving my mental well-being and tracking my daily progress.",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=John"
+  });
+  
+  const [notifications, setNotifications] = useState<NotificationSettings>({
+    email: true,
+    push: true,
+    sms: false,
+    inApp: true,
+    marketing: false
+  });
+  
+  const [appSettings, setAppSettings] = useState<AppSettings>({
+    theme: "system",
+    language: "en",
+    autoSaveJournal: true,
+    compactView: false
+  });
+  
+  const [privacySettings, setPrivacySettings] = useState<PrivacySettings>({
+    showOnlineStatus: true,
+    shareProgress: false,
+    allowDataAnalysis: true,
+    twoFactorAuth: false
   });
 
-  const [isFormChanged, setIsFormChanged] = useState(false);
-  const [isExporting, setIsExporting] = useState(false);
-  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
+  const [activeSessions] = useState([
+    { device: "iPhone 14 Pro", location: "Jakarta, Indonesia", lastActive: "2 minutes ago", current: true },
+    { device: "MacBook Pro", location: "Jakarta, Indonesia", lastActive: "Yesterday, 18:23" },
+    { device: "iPad Air", location: "Bandung, Indonesia", lastActive: "3 days ago" }
+  ]);
 
-  // Save settings to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem('userSettings', JSON.stringify(settings));
-  }, [settings]);
-
-  // Check if form has been modified
-  useEffect(() => {
-    const savedSettings = localStorage.getItem('userSettings');
-    if (savedSettings) {
-      const originalSettings = JSON.parse(savedSettings);
-      setIsFormChanged(JSON.stringify(originalSettings) !== JSON.stringify(settings));
+  // Form handlers
+  const handleProfileUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      setIsLoading(true);
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      toast({
+        title: "Profile updated",
+        description: "Your profile information has been updated successfully.",
+      });
+    } catch (error) {
+      toast({
+        title: "Update failed",
+        description: "There was a problem updating your profile. Please try again.",
+        variant: "destructive",
+      });
+      console.error("Profile update error:", error);
+    } finally {
+      setIsLoading(false);
     }
-  }, [settings]);
-
-  // Apply dark mode changes if needed
-  useEffect(() => {
-    if (settings.darkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [settings.darkMode]);
-
-  const handleChange = (field: keyof UserSettings, value: string | boolean | number) => {
-    setSettings(prev => ({
-      ...prev,
-      [field]: value
-    }));
   };
 
-  const handleSave = () => {
-    localStorage.setItem('userSettings', JSON.stringify(settings));
-    setIsFormChanged(false);
-    
-    toast({
-      title: "Settings Saved",
-      description: "Your preferences have been updated successfully"
+  const handleNotificationChange = (key: keyof NotificationSettings) => {
+    setNotifications(prev => {
+      const newSettings = { ...prev, [key]: !prev[key] };
+      // Simulate saving settings
+      setTimeout(() => {
+        toast({
+          title: "Settings saved",
+          description: `Notification preferences updated.`,
+        });
+      }, 500);
+      return newSettings;
     });
   };
 
-  const handleReset = () => {
-    const savedSettings = localStorage.getItem('userSettings');
-    if (savedSettings) {
-      setSettings(JSON.parse(savedSettings));
-      setIsFormChanged(false);
+  const handleThemeChange = (theme: ThemeOption) => {
+    setAppSettings(prev => ({ ...prev, theme }));
+    // Simulate applying theme
+    document.documentElement.classList.remove('light', 'dark');
+    if (theme !== 'system') {
+      document.documentElement.classList.add(theme);
     }
+    toast({
+      title: "Theme updated",
+      description: `Theme set to ${theme} mode.`,
+    });
+  };
+
+  const handleLanguageChange = (language: LanguageOption) => {
+    setAppSettings(prev => ({ ...prev, language }));
+    toast({
+      title: "Language updated",
+      description: `Language set to ${getLanguageName(language)}.`,
+    });
+  };
+
+  const handlePrivacyChange = (key: keyof PrivacySettings) => {
+    setPrivacySettings(prev => {
+      const newSettings = { ...prev, [key]: !prev[key] };
+      // Simulate saving settings
+      setTimeout(() => {
+        toast({
+          title: "Privacy settings updated",
+          description: `Your privacy preferences have been saved.`,
+        });
+      }, 500);
+      return newSettings;
+    });
+  };
+
+  const handleAppSettingChange = (key: keyof Omit<AppSettings, 'theme' | 'language'>) => {
+    setAppSettings(prev => {
+      const newSettings = { ...prev, [key]: !prev[key] };
+      toast({
+        title: "Settings saved",
+        description: `App settings have been updated.`,
+      });
+      return newSettings;
+    });
   };
 
   const handleLogout = () => {
     toast({
-      title: "Logged Out",
-      description: "You have been logged out successfully"
+      title: "Logged out",
+      description: "You have been successfully logged out.",
     });
-    // In a real app, you'd clear auth tokens and redirect to login
+    // Navigate to login page
+    window.location.href = "/signin";
   };
 
-  const handleExportData = () => {
-    setIsExporting(true);
-    
-    // Simulate data preparation
-    setTimeout(() => {
-      // Prepare data to export
-      const appData = {
-        userSettings: settings,
-        moodEntries: JSON.parse(localStorage.getItem('moodEntries') || '[]'),
-        journalEntries: JSON.parse(localStorage.getItem('journalEntries') || '[]'),
-        communityPosts: JSON.parse(localStorage.getItem('communityPosts') || '[]')
-      };
-      
-      // Create downloadable file
-      const dataStr = JSON.stringify(appData, null, 2);
-      const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-      
-      const exportFileDefaultName = `mindease-export-${new Date().toISOString().slice(0, 10)}.json`;
-      
-      const linkElement = document.createElement('a');
-      linkElement.setAttribute('href', dataUri);
-      linkElement.setAttribute('download', exportFileDefaultName);
-      linkElement.click();
-      
-      setIsExporting(false);
-      
+  const handleDeleteAccount = async () => {
+    setIsLoading(true);
+    try {
+      // Simulate API call for account deletion
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      setIsDeleteDialogOpen(false);
       toast({
-        title: "Data Exported",
-        description: "Your data has been exported successfully"
+        title: "Account deleted",
+        description: "Your account has been permanently deleted. Redirecting to homepage...",
+      });
+      // Redirect to homepage after delay
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 2000);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "There was a problem deleting your account. Please try again.",
+        variant: "destructive",
+      });
+      console.error("Account deletion error:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSessionTerminate = (index: number) => {
+    toast({
+      title: "Session terminated",
+      description: `The session on ${activeSessions[index].device} has been terminated.`,
+    });
+    // In a real app you would update the sessions list here
+  };
+
+  const handleDataExport = () => {
+    setIsLoading(true);
+    // Simulate data export process
+    setTimeout(() => {
+      setIsLoading(false);
+      toast({
+        title: "Data exported",
+        description: "Your data has been exported. Check your email for the download link.",
       });
     }, 1500);
   };
 
-  const handleDeleteAccountRequest = () => {
-    setIsDeletingAccount(true);
+  const getLanguageName = (code: LanguageOption): string => {
+    const languages = {
+      en: "English",
+      id: "Bahasa Indonesia",
+      es: "Español",
+      fr: "Français",
+      de: "Deutsch"
+    };
+    return languages[code];
   };
 
-  const confirmDeleteAccount = () => {
-    // In a real app you would call an API to delete the user's account
-    localStorage.clear();
-    
-    toast({
-      title: "Account Deleted",
-      description: "Your account and all associated data have been deleted"
-    });
-    
-    setIsDeletingAccount(false);
-    // In a real app, you'd redirect to a landing page
-  };
-
-  const cancelDeleteAccount = () => {
-    setIsDeletingAccount(false);
-  };
-
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case 'profile':
-        return (
-          <div className="space-y-6">
-            <div className="flex flex-col md:flex-row gap-6">
-              <div className="md:w-1/3 flex flex-col items-center">
-                <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-primary/20 mb-4">
-                  <img 
-                    src={settings.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${settings.name}`} 
-                    alt="User avatar" 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <Button variant="outline" size="sm" className="mt-2">
-                  <Pencil className="h-4 w-4 mr-2" />
-                  Change Avatar
-                </Button>
-              </div>
-              
-              <div className="md:w-2/3 space-y-4">
-                <div>
-                  <Label htmlFor="name">Full Name</Label>
-                  <Input
-                    id="name"
-                    value={settings.name}
-                    onChange={(e) => handleChange('name', e.target.value)}
-                    className="mt-1"
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={settings.email}
-                    onChange={(e) => handleChange('email', e.target.value)}
-                    className="mt-1"
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="bio">Bio</Label>
-                  <Textarea
-                    id="bio"
-                    value={settings.bio}
-                    onChange={(e) => handleChange('bio', e.target.value)}
-                    className="mt-1"
-                    rows={4}
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="language">Language</Label>
-                  <Select 
-                    value={settings.language} 
-                    onValueChange={(value) => handleChange('language', value)}
-                  >
-                    <SelectTrigger className="mt-1">
-                      <SelectValue placeholder="Select language" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {languages.map((language) => (
-                        <SelectItem key={language.value} value={language.value}>
-                          {language.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div>
-                  <Label htmlFor="timezone">Timezone</Label>
-                  <Select 
-                    value={settings.timezone} 
-                    onValueChange={(value) => handleChange('timezone', value)}
-                  >
-                    <SelectTrigger className="mt-1">
-                      <SelectValue placeholder="Select timezone" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {timezones.map((timezone) => (
-                        <SelectItem key={timezone.value} value={timezone.value}>
-                          {timezone.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-      
-      case 'notifications':
-        return (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <h3 className="text-base font-medium">Enable notifications</h3>
-                <p className="text-sm text-muted-foreground">Receive notifications about updates and activities</p>
-              </div>
-              <Switch
-                checked={settings.notifications}
-                onCheckedChange={(checked) => handleChange('notifications', checked)}
-              />
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <h3 className="text-base font-medium">Daily meditation reminders</h3>
-                <p className="text-sm text-muted-foreground">Get reminded to meditate each day</p>
-              </div>
-              <Switch
-                checked={settings.dailyReminders}
-                onCheckedChange={(checked) => handleChange('dailyReminders', checked)}
-                disabled={!settings.notifications}
-              />
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <h3 className="text-base font-medium">Weekly progress reports</h3>
-                <p className="text-sm text-muted-foreground">Receive a summary of your weekly wellbeing progress</p>
-              </div>
-              <Switch
-                checked={settings.weeklyReports}
-                onCheckedChange={(checked) => handleChange('weeklyReports', checked)}
-                disabled={!settings.notifications}
-              />
-            </div>
-          </div>
-        );
-      
-      case 'appearance':
-        return (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <h3 className="text-base font-medium">Dark mode</h3>
-                <p className="text-sm text-muted-foreground">Use dark theme for a more comfortable experience</p>
-              </div>
-              <Switch
-                checked={settings.darkMode}
-                onCheckedChange={(checked) => handleChange('darkMode', checked)}
-              />
-            </div>
-            
-            <div className="mt-6">
-              <h3 className="text-base font-medium mb-4">Theme Colors</h3>
-              <div className="grid grid-cols-4 gap-2">
-                {['#9b87f5', '#4F46E5', '#10B981', '#F59E0B', '#EF4444', '#EC4899'].map((color) => (
-                  <button
-                    key={color}
-                    className="w-12 h-12 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background focus:ring-primary"
-                    style={{ backgroundColor: color }}
-                    onClick={() => {
-                      // In a real app, this would update theme colors
-                      toast({
-                        title: "Theme Updated",
-                        description: "This feature is coming soon!"
-                      });
-                    }}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
-        );
-      
-      case 'privacy':
-        return (
-          <div className="space-y-6">
-            <div>
-              <Label htmlFor="privacyLevel">Profile Privacy</Label>
-              <Select 
-                value={settings.privacyLevel} 
-                onValueChange={(value) => handleChange('privacyLevel', value)}
-              >
-                <SelectTrigger className="mt-1">
-                  <SelectValue placeholder="Select privacy level" />
-                </SelectTrigger>
-                <SelectContent>
-                  {privacyLevels.map((level) => (
-                    <SelectItem key={level.value} value={level.value}>
-                      {level.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <p className="text-sm text-muted-foreground mt-2">
-                Control who can see your profile and activity
-              </p>
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <h3 className="text-base font-medium">Allow anonymous data sharing</h3>
-                <p className="text-sm text-muted-foreground">Help improve MindEase by sharing anonymized usage data</p>
-              </div>
-              <Switch
-                checked={settings.dataSharing}
-                onCheckedChange={(checked) => handleChange('dataSharing', checked)}
-              />
-            </div>
-            
-            <Button 
-              variant="outline" 
-              className="w-full flex items-center gap-2"
-              onClick={handleExportData}
-              disabled={isExporting}
-            >
-              {isExporting ? (
-                <>
-                  <div className="h-4 w-4 border-2 border-current border-r-transparent rounded-full animate-spin" />
-                  Preparing data...
-                </>
-              ) : (
-                <>
-                  <Download className="h-4 w-4" />
-                  Export Your Data
-                </>
-              )}
-            </Button>
-          </div>
-        );
-      
-      case 'sessions':
-        return (
-          <div className="space-y-6">
-            <div>
-              <Label htmlFor="sessionDuration">Default meditation duration (minutes)</Label>
-              <Input
-                id="sessionDuration"
-                type="number"
-                min="1"
-                max="60"
-                value={settings.sessionDuration}
-                onChange={(e) => handleChange('sessionDuration', parseInt(e.target.value) || 5)}
-                className="mt-1"
-              />
-              <p className="text-sm text-muted-foreground mt-2">
-                Set your preferred meditation session length
-              </p>
-            </div>
-            
-            <div className="bg-muted/30 p-4 rounded-lg space-y-4">
-              <h3 className="font-medium">Recent Sessions</h3>
-              
-              <div className="space-y-3">
-                {[
-                  { date: "Today, 10:30 AM", duration: "15 min", type: "Mindfulness" },
-                  { date: "Yesterday, 5:45 PM", duration: "20 min", type: "Sleep" },
-                  { date: "May 10, 2023, 7:15 AM", duration: "10 min", type: "Focus" }
-                ].map((session, index) => (
-                  <div key={index} className="flex justify-between items-center p-2 bg-background rounded border border-border">
-                    <div>
-                      <p className="font-medium">{session.type}</p>
-                      <p className="text-sm text-muted-foreground">{session.date}</p>
-                    </div>
-                    <span className="text-sm bg-primary/10 text-primary px-2.5 py-0.5 rounded-full">
-                      {session.duration}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        );
-      
-      case 'advanced':
-        return (
-          <div className="space-y-6">
-            <div className="p-4 border border-destructive/20 bg-destructive/5 rounded-lg">
-              <h3 className="text-lg font-medium text-destructive mb-2">Danger Zone</h3>
-              <p className="text-sm mb-4">
-                These actions are permanent and cannot be undone.
-              </p>
-              
-              {isDeletingAccount ? (
-                <div className="space-y-4">
-                  <p className="text-sm font-medium">Are you sure you want to delete your account? All your data will be permanently removed.</p>
-                  <div className="flex gap-3">
-                    <Button 
-                      variant="destructive" 
-                      onClick={confirmDeleteAccount}
-                    >
-                      Yes, Delete My Account
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      onClick={cancelDeleteAccount}
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <Button 
-                  variant="destructive" 
-                  onClick={handleDeleteAccountRequest}
-                  className="w-full sm:w-auto"
-                >
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Delete Account
-                </Button>
-              )}
-            </div>
-          </div>
-        );
-      
-      default:
-        return null;
-    }
+  const generateRandomAvatar = () => {
+    const seeds = ["Felix", "Aneka", "Sasha", "Jasper", "Lorelei", "Zephyr", "Maya", "Leo"];
+    const randomSeed = seeds[Math.floor(Math.random() * seeds.length)];
+    const newAvatar = `https://api.dicebear.com/7.x/avataaars/svg?seed=${randomSeed}`;
+    setProfile(prev => ({ ...prev, avatar: newAvatar }));
   };
 
   return (
-    <motion.div
+    <motion.div 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="min-h-screen bg-background p-4 md:p-8"
+      className="container max-w-6xl px-4 py-8 mx-auto"
     >
-      <div className="max-w-5xl mx-auto">
-        <div className="flex items-center gap-4 mb-8">
-          <div className="bg-primary/10 p-3 rounded-full">
-            <SettingsIcon className="h-6 w-6 text-primary" />
-          </div>
-          <div>
-            <h1 className="text-3xl font-bold">Settings</h1>
-            <p className="text-muted-foreground">Customize your MindEase experience</p>
+      <h1 className="mb-8 text-4xl font-bold text-center md:text-left">Settings</h1>
+      
+      <div className="grid gap-8 md:grid-cols-[250px_1fr]">
+        {/* Sidebar */}
+        <div className="hidden md:block">
+          <div className="p-4 space-y-1 border rounded-lg">
+            <Button 
+              variant={activeTab === "profile" ? "default" : "ghost"} 
+              className="justify-start w-full"
+              onClick={() => setActiveTab("profile")}
+            >
+              <User className="mr-2" /> Profile
+            </Button>
+            <Button 
+              variant={activeTab === "notifications" ? "default" : "ghost"} 
+              className="justify-start w-full"
+              onClick={() => setActiveTab("notifications")}
+            >
+              <Bell className="mr-2" /> Notifications
+            </Button>
+            <Button 
+              variant={activeTab === "appearance" ? "default" : "ghost"} 
+              className="justify-start w-full"
+              onClick={() => setActiveTab("appearance")}
+            >
+              <Brush className="mr-2" /> Appearance
+            </Button>
+            <Button 
+              variant={activeTab === "privacy" ? "default" : "ghost"} 
+              className="justify-start w-full"
+              onClick={() => setActiveTab("privacy")}
+            >
+              <Lock className="mr-2" /> Privacy
+            </Button>
+            <Button 
+              variant={activeTab === "security" ? "default" : "ghost"} 
+              className="justify-start w-full"
+              onClick={() => setActiveTab("security")}
+            >
+              <Shield className="mr-2" /> Security
+            </Button>
+            <Button 
+              variant={activeTab === "advanced" ? "default" : "ghost"} 
+              className="justify-start w-full"
+              onClick={() => setActiveTab("advanced")}
+            >
+              <SettingsIcon className="mr-2" /> Advanced
+            </Button>
           </div>
         </div>
+        
+        {/* Mobile Tabs */}
+        <div className="md:hidden">
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="w-full h-auto p-1 mb-6 grid grid-cols-3 gap-1">
+              <TabsTrigger value="profile" className="py-2">
+                <User className="w-4 h-4 mr-2" /> Profile
+              </TabsTrigger>
+              <TabsTrigger value="notifications" className="py-2">
+                <Bell className="w-4 h-4 mr-2" /> Notifications
+              </TabsTrigger>
+              <TabsTrigger value="appearance" className="py-2">
+                <Brush className="w-4 h-4 mr-2" /> Appearance
+              </TabsTrigger>
+              <TabsTrigger value="privacy" className="py-2">
+                <Lock className="w-4 h-4 mr-2" /> Privacy
+              </TabsTrigger>
+              <TabsTrigger value="security" className="py-2">
+                <Shield className="w-4 h-4 mr-2" /> Security
+              </TabsTrigger>
+              <TabsTrigger value="advanced" className="py-2">
+                <SettingsIcon className="w-4 h-4 mr-2" /> Advanced
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
+        
+        {/* Settings Content */}
+        <div className="p-6 border rounded-lg shadow-sm">
+          {/* Profile Settings */}
+          {activeTab === "profile" && (
+            <div>
+              <h2 className="mb-6 text-2xl font-semibold">Profile Settings</h2>
+              <div className="flex flex-col items-center gap-4 p-4 mb-6 border rounded-lg sm:flex-row sm:items-start">
+                <div className="relative">
+                  <img 
+                    src={profile.avatar} 
+                    alt="Profile" 
+                    className="object-cover w-24 h-24 rounded-full ring-2 ring-primary/20"
+                  />
+                  <Button 
+                    size="icon" 
+                    variant="secondary" 
+                    className="absolute bottom-0 right-0 w-8 h-8 rounded-full" 
+                    onClick={generateRandomAvatar}
+                  >
+                    <Brush className="w-4 h-4" />
+                  </Button>
+                </div>
+                <div className="flex-1 space-y-2 text-center sm:text-left">
+                  <h3 className="text-xl font-medium">{profile.fullName}</h3>
+                  <p className="text-muted-foreground">{profile.email}</p>
+                  <div className="flex flex-wrap justify-center gap-2 sm:justify-start">
+                    <Button variant="outline" size="sm" onClick={generateRandomAvatar}>
+                      Change Avatar
+                    </Button>
+                  </div>
+                </div>
+              </div>
+              
+              <form onSubmit={handleProfileUpdate} className="space-y-6">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="fullName">Full Name</Label>
+                    <Input
+                      id="fullName"
+                      value={profile.fullName}
+                      onChange={(e) => setProfile({...profile, fullName: e.target.value})}
+                      required
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={profile.email}
+                      onChange={(e) => setProfile({...profile, email: e.target.value})}
+                      required
+                    />
+                  </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-[250px_1fr] gap-8">
-          {/* Navigation Sidebar */}
-          <div className="bg-card rounded-lg p-4 h-fit shadow-sm">
-            <nav className="space-y-1">
-              <Button 
-                variant={activeTab === 'profile' ? 'default' : 'ghost'} 
-                className="w-full justify-start" 
-                onClick={() => setActiveTab('profile')}
-              >
-                <User className="h-4 w-4 mr-2" />
-                Profile
-              </Button>
-              
-              <Button 
-                variant={activeTab === 'notifications' ? 'default' : 'ghost'} 
-                className="w-full justify-start" 
-                onClick={() => setActiveTab('notifications')}
-              >
-                <Bell className="h-4 w-4 mr-2" />
-                Notifications
-              </Button>
-              
-              <Button 
-                variant={activeTab === 'appearance' ? 'default' : 'ghost'} 
-                className="w-full justify-start" 
-                onClick={() => setActiveTab('appearance')}
-              >
-                <Moon className="h-4 w-4 mr-2" />
-                Appearance
-              </Button>
-              
-              <Button 
-                variant={activeTab === 'privacy' ? 'default' : 'ghost'} 
-                className="w-full justify-start" 
-                onClick={() => setActiveTab('privacy')}
-              >
-                <Shield className="h-4 w-4 mr-2" />
-                Privacy
-              </Button>
-              
-              <Button 
-                variant={activeTab === 'sessions' ? 'default' : 'ghost'} 
-                className="w-full justify-start" 
-                onClick={() => setActiveTab('sessions')}
-              >
-                <Clock className="h-4 w-4 mr-2" />
-                Sessions
-              </Button>
-              
-              <Button 
-                variant={activeTab === 'advanced' ? 'default' : 'ghost'} 
-                className="w-full justify-start" 
-                onClick={() => setActiveTab('advanced')}
-              >
-                <Laptop className="h-4 w-4 mr-2" />
-                Advanced
-              </Button>
-            </nav>
-            
-            <div className="pt-4 mt-4 border-t">
-              <Button 
-                variant="outline" 
-                className="w-full justify-start text-destructive" 
-                onClick={handleLogout}
-              >
-                <LogOut className="h-4 w-4 mr-2" />
-                Log Out
-              </Button>
-            </div>
-          </div>
-          
-          {/* Content Area */}
-          <div className="bg-card rounded-lg p-6 shadow-sm">
-            {renderTabContent()}
-            
-            {isFormChanged && (
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mt-6 flex items-center justify-end gap-4 border-t pt-6"
-              >
-                <Button 
-                  variant="outline" 
-                  onClick={handleReset}
-                >
-                  Cancel
-                </Button>
+                  <div className="space-y-2">
+                    <Label htmlFor="phone">Phone</Label>
+                    <Input
+                      id="phone"
+                      value={profile.phone}
+                      onChange={(e) => setProfile({...profile, phone: e.target.value})}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="bio">Bio</Label>
+                    <Textarea
+                      id="bio"
+                      value={profile.bio}
+                      onChange={(e) => setProfile({...profile, bio: e.target.value})}
+                      rows={4}
+                    />
+                  </div>
+                </div>
                 
-                <Button 
-                  onClick={handleSave}
-                  className="gap-2"
-                >
-                  <Save className="h-4 w-4" />
-                  Save Changes
+                <Button type="submit" className="w-full sm:w-auto" disabled={isLoading}>
+                  {isLoading ? "Saving..." : "Save Changes"}
                 </Button>
-              </motion.div>
-            )}
-          </div>
+              </form>
+            </div>
+          )}
+          
+          {/* Notification Settings */}
+          {activeTab === "notifications" && (
+            <div>
+              <h2 className="mb-6 text-2xl font-semibold">Notification Preferences</h2>
+              
+              <div className="space-y-6">
+                <div className="p-4 border rounded-lg">
+                  <h3 className="mb-4 text-lg font-medium">Notification Channels</h3>
+                  
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">Email Notifications</p>
+                        <p className="text-sm text-muted-foreground">Receive updates via email</p>
+                      </div>
+                      <Switch 
+                        checked={notifications.email}
+                        onCheckedChange={() => handleNotificationChange('email')}
+                      />
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">Push Notifications</p>
+                        <p className="text-sm text-muted-foreground">Notifications on your device</p>
+                      </div>
+                      <Switch 
+                        checked={notifications.push}
+                        onCheckedChange={() => handleNotificationChange('push')}
+                      />
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">SMS Notifications</p>
+                        <p className="text-sm text-muted-foreground">Get text notifications</p>
+                      </div>
+                      <Switch 
+                        checked={notifications.sms}
+                        onCheckedChange={() => handleNotificationChange('sms')}
+                      />
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">In-app Notifications</p>
+                        <p className="text-sm text-muted-foreground">Notification within the app</p>
+                      </div>
+                      <Switch 
+                        checked={notifications.inApp}
+                        onCheckedChange={() => handleNotificationChange('inApp')}
+                      />
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="p-4 border rounded-lg">
+                  <h3 className="mb-4 text-lg font-medium">Notification Types</h3>
+                  
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">Marketing & Newsletters</p>
+                        <p className="text-sm text-muted-foreground">Tips, updates and promotions</p>
+                      </div>
+                      <Switch 
+                        checked={notifications.marketing}
+                        onCheckedChange={() => handleNotificationChange('marketing')}
+                      />
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">Activity Reminders</p>
+                        <p className="text-sm text-muted-foreground">Daily and weekly reminders</p>
+                      </div>
+                      <Switch checked={true} />
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">Achievement Alerts</p>
+                        <p className="text-sm text-muted-foreground">Progress and milestones</p>
+                      </div>
+                      <Switch checked={true} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {/* Appearance Settings */}
+          {activeTab === "appearance" && (
+            <div>
+              <h2 className="mb-6 text-2xl font-semibold">Appearance Settings</h2>
+              
+              <div className="space-y-6">
+                <div className="p-4 border rounded-lg">
+                  <h3 className="mb-4 text-lg font-medium">Theme</h3>
+                  
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                    <div
+                      className={`p-4 border rounded-lg cursor-pointer transition-all ${
+                        appSettings.theme === "light" ? "border-primary ring-2 ring-primary/20" : ""
+                      }`}
+                      onClick={() => handleThemeChange("light")}
+                    >
+                      <div className="flex items-center justify-center p-3 mb-2 rounded-lg bg-neutral-100">
+                        <Sun className="w-6 h-6 text-amber-500" />
+                      </div>
+                      <p className="font-medium text-center">Light</p>
+                    </div>
+                    
+                    <div
+                      className={`p-4 border rounded-lg cursor-pointer transition-all ${
+                        appSettings.theme === "dark" ? "border-primary ring-2 ring-primary/20" : ""
+                      }`}
+                      onClick={() => handleThemeChange("dark")}
+                    >
+                      <div className="flex items-center justify-center p-3 mb-2 rounded-lg bg-slate-800">
+                        <Moon className="w-6 h-6 text-slate-400" />
+                      </div>
+                      <p className="font-medium text-center">Dark</p>
+                    </div>
+                    
+                    <div
+                      className={`p-4 border rounded-lg cursor-pointer transition-all ${
+                        appSettings.theme === "system" ? "border-primary ring-2 ring-primary/20" : ""
+                      }`}
+                      onClick={() => handleThemeChange("system")}
+                    >
+                      <div className="flex items-center justify-center p-3 mb-2 bg-gradient-to-r from-neutral-100 to-slate-800 rounded-lg">
+                        <div className="w-6 h-6 bg-gradient-to-r from-amber-500 to-slate-400 rounded-full" />
+                      </div>
+                      <p className="font-medium text-center">System</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="p-4 border rounded-lg">
+                  <h3 className="mb-4 text-lg font-medium">Language</h3>
+                  
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-5">
+                    {(["en", "id", "es", "fr", "de"] as LanguageOption[]).map((lang) => (
+                      <div
+                        key={lang}
+                        className={`p-2 border rounded-lg cursor-pointer transition-all ${
+                          appSettings.language === lang ? "border-primary ring-2 ring-primary/20" : ""
+                        }`}
+                        onClick={() => handleLanguageChange(lang)}
+                      >
+                        <div className="flex items-center justify-center mb-1">
+                          <Languages className="w-5 h-5" />
+                        </div>
+                        <p className="text-xs font-medium text-center">{getLanguageName(lang)}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="p-4 border rounded-lg">
+                  <h3 className="mb-4 text-lg font-medium">Interface</h3>
+                  
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">Compact View</p>
+                        <p className="text-sm text-muted-foreground">Reduce spacing in the interface</p>
+                      </div>
+                      <Switch 
+                        checked={appSettings.compactView}
+                        onCheckedChange={() => handleAppSettingChange('compactView')}
+                      />
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">Auto-save Journal</p>
+                        <p className="text-sm text-muted-foreground">Automatically save journal entries</p>
+                      </div>
+                      <Switch 
+                        checked={appSettings.autoSaveJournal}
+                        onCheckedChange={() => handleAppSettingChange('autoSaveJournal')}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {/* Privacy Settings */}
+          {activeTab === "privacy" && (
+            <div>
+              <h2 className="mb-6 text-2xl font-semibold">Privacy Settings</h2>
+              
+              <div className="space-y-6">
+                <div className="p-4 border rounded-lg">
+                  <h3 className="mb-4 text-lg font-medium">Visibility</h3>
+                  
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">Show Online Status</p>
+                        <p className="text-sm text-muted-foreground">Allow others to see when you're active</p>
+                      </div>
+                      <Switch 
+                        checked={privacySettings.showOnlineStatus}
+                        onCheckedChange={() => handlePrivacyChange('showOnlineStatus')}
+                      />
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">Share Progress</p>
+                        <p className="text-sm text-muted-foreground">Share your progress with community</p>
+                      </div>
+                      <Switch 
+                        checked={privacySettings.shareProgress}
+                        onCheckedChange={() => handlePrivacyChange('shareProgress')}
+                      />
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="p-4 border rounded-lg">
+                  <h3 className="mb-4 text-lg font-medium">Data Usage</h3>
+                  
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">Allow Data Analysis</p>
+                        <p className="text-sm text-muted-foreground">Help improve the app with anonymous data</p>
+                      </div>
+                      <Switch 
+                        checked={privacySettings.allowDataAnalysis}
+                        onCheckedChange={() => handlePrivacyChange('allowDataAnalysis')}
+                      />
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="p-4 border rounded-lg">
+                  <h3 className="mb-4 text-lg font-medium">Data Export</h3>
+                  
+                  <Button 
+                    variant="outline" 
+                    onClick={handleDataExport}
+                    disabled={isLoading}
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    {isLoading ? "Processing..." : "Export All My Data"}
+                  </Button>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    Export all your personal data, settings, journal entries, and logs.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {/* Security Settings */}
+          {activeTab === "security" && (
+            <div>
+              <h2 className="mb-6 text-2xl font-semibold">Security Settings</h2>
+              
+              <div className="space-y-6">
+                <div className="p-4 border rounded-lg">
+                  <h3 className="mb-4 text-lg font-medium">Authentication</h3>
+                  
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">Two-Factor Authentication</p>
+                        <p className="text-sm text-muted-foreground">Add an extra layer of security</p>
+                      </div>
+                      <Switch 
+                        checked={privacySettings.twoFactorAuth}
+                        onCheckedChange={() => handlePrivacyChange('twoFactorAuth')}
+                      />
+                    </div>
+                    
+                    <div className="pt-2">
+                      <Button variant="outline">
+                        <KeySquare className="w-4 h-4 mr-2" />
+                        Change Password
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="p-4 border rounded-lg">
+                  <h3 className="mb-4 text-lg font-medium">Active Sessions</h3>
+                  
+                  <div className="space-y-3">
+                    {activeSessions.map((session, index) => (
+                      <div key={index} className="flex items-start justify-between p-3 border rounded-lg">
+                        <div className="flex items-start space-x-3">
+                          <div className="mt-1">
+                            <Smartphone className="w-5 h-5 text-primary" />
+                          </div>
+                          <div>
+                            <div className="flex items-center">
+                              <p className="font-medium">{session.device}</p>
+                              {session.current && (
+                                <span className="px-2 py-0.5 ml-2 text-xs text-green-700 bg-green-100 rounded-full">
+                                  Current
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-sm text-muted-foreground">{session.location}</p>
+                            <p className="text-xs text-muted-foreground">Last active: {session.lastActive}</p>
+                          </div>
+                        </div>
+                        {!session.current && (
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={() => handleSessionTerminate(index)}
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="p-4 border rounded-lg">
+                  <h3 className="mb-4 text-lg font-medium">Account Control</h3>
+                  
+                  <div className="flex flex-wrap gap-3">
+                    <Button variant="outline" onClick={handleLogout}>
+                      <LogOut className="w-4 h-4 mr-2" />
+                      Sign Out
+                    </Button>
+                    <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="destructive">
+                          Delete Account
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This action cannot be undone. This will permanently delete your account
+                            and remove all your data from our servers.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={handleDeleteAccount} disabled={isLoading}>
+                            {isLoading ? "Deleting..." : "Delete Account"}
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {/* Advanced Settings */}
+          {activeTab === "advanced" && (
+            <div>
+              <h2 className="mb-6 text-2xl font-semibold">Advanced Settings</h2>
+              
+              <div className="space-y-6">
+                <div className="p-4 border rounded-lg">
+                  <h3 className="mb-4 text-lg font-medium">Data Sync</h3>
+                  
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">Background Sync</p>
+                        <p className="text-sm text-muted-foreground">Sync data while app is in background</p>
+                      </div>
+                      <Switch checked={true} />
+                    </div>
+                    
+                    <div className="flex items-center gap-4">
+                      <Button variant="outline">
+                        <Cloud className="w-4 h-4 mr-2" />
+                        Sync Now
+                      </Button>
+                      <p className="text-sm text-muted-foreground">Last synced: 5 minutes ago</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="p-4 border rounded-lg">
+                  <h3 className="mb-4 text-lg font-medium">Activity Logs</h3>
+                  
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-4">
+                      <Button variant="outline" size="sm">
+                        <History className="w-4 h-4 mr-2" />
+                        View Activity Logs
+                      </Button>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      View a detailed history of your account activity for security purposes.
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="p-4 border rounded-lg">
+                  <h3 className="mb-4 text-lg font-medium">Developer Options</h3>
+                  
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">Debug Mode</p>
+                        <p className="text-sm text-muted-foreground">Enable advanced logging</p>
+                      </div>
+                      <Switch checked={false} />
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">API Access</p>
+                        <p className="text-sm text-muted-foreground">Allow third-party API access</p>
+                      </div>
+                      <Switch checked={false} />
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="p-4 border rounded-lg">
+                  <h3 className="mb-4 text-lg font-medium">Application Info</h3>
+                  
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <p className="text-sm">Version</p>
+                      <p className="text-sm font-medium">2.4.1</p>
+                    </div>
+                    <div className="flex justify-between">
+                      <p className="text-sm">Build</p>
+                      <p className="text-sm font-medium">2023.06.15.123</p>
+                    </div>
+                    <div className="flex justify-between">
+                      <p className="text-sm">Platform</p>
+                      <p className="text-sm font-medium">Web</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </motion.div>
