@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
@@ -26,7 +25,8 @@ import {
   MicrochipIcon,
   Microchip,
   ScanFace,
-  Rocket
+  Rocket,
+  ShieldCheck
 } from "lucide-react";
 import { HealthStatus } from "@/components/HealthStatus";
 import { HealthChart } from "@/components/HealthChart";
@@ -43,7 +43,6 @@ interface HealthData {
   caloriesBurned: number;
   stressLevel: string;
   lastUpdated: Date;
-  // New health metrics
   bodyTemperature: number;
   immuneSystemScore: number;
   hydrationLevel: number;
@@ -68,7 +67,6 @@ const HealthMonitoring = () => {
     caloriesBurned: 1850,
     stressLevel: "Normal",
     lastUpdated: new Date(),
-    // Initialize new metrics
     bodyTemperature: 36.7,
     immuneSystemScore: 92,
     hydrationLevel: 78,
@@ -77,7 +75,6 @@ const HealthMonitoring = () => {
   });
 
   useEffect(() => {
-    // Simulate loading data
     const timer = setTimeout(() => {
       setIsLoading(false);
       toast({
@@ -89,7 +86,6 @@ const HealthMonitoring = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Click outside to close calendar
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (calendarRef.current && !calendarRef.current.contains(event.target as Node)) {
@@ -103,7 +99,6 @@ const HealthMonitoring = () => {
     };
   }, []);
 
-  // Simulate data updates
   useEffect(() => {
     const interval = setInterval(() => {
       setHealthData(prev => ({
@@ -275,7 +270,6 @@ const HealthMonitoring = () => {
           </div>
         </motion.div>
 
-        {/* Health Status Overview */}
         <section className="mb-8">
           <motion.div
             initial={{ y: 20, opacity: 0 }}
@@ -299,7 +293,7 @@ const HealthMonitoring = () => {
               <HealthStatus 
                 title="Immune System" 
                 score={healthData.immuneSystemScore} 
-                icon={<Shield className="h-6 w-6 text-green-500" />} 
+                icon={<ShieldCheck className="h-6 w-6 text-green-500" />} 
                 description="Strong resistance" 
               />
               <HealthStatus 
@@ -312,7 +306,6 @@ const HealthMonitoring = () => {
           </motion.div>
         </section>
 
-        {/* Health Charts */}
         <motion.section 
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -328,7 +321,6 @@ const HealthMonitoring = () => {
           </div>
         </motion.section>
 
-        {/* Neural Health Section */}
         <motion.section 
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -364,7 +356,6 @@ const HealthMonitoring = () => {
           </div>
         </motion.section>
 
-        {/* Cardiac Health Section */}
         <motion.section 
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -400,7 +391,6 @@ const HealthMonitoring = () => {
           </div>
         </motion.section>
 
-        {/* Physical Metrics */}
         <motion.section 
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -436,7 +426,6 @@ const HealthMonitoring = () => {
           </div>
         </motion.section>
 
-        {/* Advanced Metrics */}
         <motion.section 
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -472,7 +461,6 @@ const HealthMonitoring = () => {
           </div>
         </motion.section>
 
-        {/* Sleep Analysis Section */}
         <motion.section 
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -508,7 +496,6 @@ const HealthMonitoring = () => {
           </div>
         </motion.section>
 
-        {/* Device Integration */}
         <motion.section 
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
