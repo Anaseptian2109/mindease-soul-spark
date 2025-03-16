@@ -1,3 +1,4 @@
+
 import { motion } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
@@ -19,18 +20,18 @@ import {
   ArrowUpRight,
   Sparkles,
   BrainCircuit,
-  Heart as HeartIcon,
-  ZapIcon,
   Zap,
-  MicrochipIcon,
   Microchip,
   ScanFace,
   Rocket,
-  ShieldCheck
+  ShieldCheck,
+  MessageSquare
 } from "lucide-react";
 import { HealthStatus } from "@/components/HealthStatus";
 import { HealthChart } from "@/components/HealthChart";
 import { Calendar } from "@/components/ui/calendar";
+import { AISuperDoctor } from "@/components/AISuperDoctor";
+import { AIVirtualDoctor } from "@/components/AIVirtualDoctor";
 
 interface HealthData {
   heartRate: number;
@@ -55,6 +56,7 @@ const HealthMonitoring = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [date, setDate] = useState<Date>(new Date());
   const [showCalendar, setShowCalendar] = useState(false);
+  const [showVirtualDoctor, setShowVirtualDoctor] = useState(false);
   const calendarRef = useRef<HTMLDivElement>(null);
   const [healthData, setHealthData] = useState<HealthData>({
     heartRate: 75,
@@ -267,8 +269,19 @@ const HealthMonitoring = () => {
                 Last scan: {healthData.lastUpdated.toLocaleTimeString()}
               </span>
             </div>
+            <Button 
+              variant="outline" 
+              onClick={() => setShowVirtualDoctor(true)}
+              className="glass-panel backdrop-blur-md border-white/10 gap-2"
+            >
+              <MessageSquare className="h-4 w-4" />
+              Medical AI
+            </Button>
           </div>
         </motion.div>
+
+        {/* AI Super Doctor Section */}
+        <AISuperDoctor onOpenChat={() => setShowVirtualDoctor(true)} />
 
         <section className="mb-8">
           <motion.div
@@ -568,6 +581,11 @@ const HealthMonitoring = () => {
           </div>
         </motion.section>
       </div>
+      
+      <AIVirtualDoctor 
+        isOpen={showVirtualDoctor} 
+        onClose={() => setShowVirtualDoctor(false)} 
+      />
     </motion.div>
   );
 };
