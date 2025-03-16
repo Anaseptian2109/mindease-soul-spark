@@ -39,12 +39,15 @@
 
   body {
     @apply bg-background text-foreground font-inter;
+    background-image: 
+      radial-gradient(circle at 25% 10%, rgba(155, 135, 245, 0.05) 0%, transparent 35%),
+      radial-gradient(circle at 75% 90%, rgba(155, 135, 245, 0.05) 0%, transparent 35%);
   }
 }
 
 @layer components {
   .glass-panel {
-    @apply backdrop-blur-lg bg-white/80 border border-white/20 shadow-lg transition-all;
+    @apply backdrop-blur-lg bg-white/10 border border-white/20 shadow-lg transition-all;
   }
   
   .slide-up {
@@ -78,6 +81,37 @@
   .floating {
     animation: floating 3s ease-in-out infinite;
   }
+  
+  .futuristic-border {
+    @apply relative;
+    overflow: hidden;
+  }
+  
+  .futuristic-border::after {
+    content: '';
+    @apply absolute inset-0 rounded-xl;
+    background: linear-gradient(90deg, transparent, rgba(155, 135, 245, 0.3), transparent);
+    animation: gradient-border 3s linear infinite;
+  }
+  
+  .pulse-glow {
+    animation: pulse-glow 2s infinite ease-in-out;
+  }
+  
+  .floating-icon {
+    animation: floating-icon 3s ease-in-out infinite;
+  }
+  
+  .shield {
+    @apply relative;
+  }
+  
+  .shield::before {
+    content: '';
+    @apply absolute inset-0 rounded-full;
+    background: radial-gradient(circle, rgba(155, 135, 245, 0.3) 0%, transparent 70%);
+    animation: shield-pulse 2s infinite ease-in-out;
+  }
 }
 
 @layer utilities {
@@ -106,6 +140,54 @@
   }
   100% {
     transform: translateY(0px);
+  }
+}
+
+@keyframes gradient-border {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes pulse-glow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(155, 135, 245, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(155, 135, 245, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(155, 135, 245, 0);
+  }
+}
+
+@keyframes floating-icon {
+  0% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-5px) rotate(5deg);
+  }
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+}
+
+@keyframes shield-pulse {
+  0% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.2;
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 0.5;
+    transform: scale(1);
   }
 }
 
