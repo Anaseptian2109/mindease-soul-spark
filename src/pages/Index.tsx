@@ -1,6 +1,6 @@
 
 import { motion } from "framer-motion";
-import { ChevronRight, Heart, Brain, Moon, Activity, Loader2, Shield, Lock, UserCheck } from "lucide-react";
+import { ChevronRight, Heart, Brain, Moon, Activity, Loader2, Shield, Lock, UserCheck, Sparkles, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -50,17 +50,23 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary">
       {/* Hero Section */}
-      <section className="container px-4 pt-32 pb-20">
+      <section className="container px-4 pt-32 pb-20 relative overflow-hidden">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-center max-w-3xl mx-auto"
+          className="text-center max-w-3xl mx-auto relative z-10"
         >
-          <span className="px-3 py-1 mb-6 inline-block bg-primary/10 text-primary rounded-full text-sm font-medium">
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="px-4 py-2 mb-6 inline-block bg-primary/10 text-primary rounded-full text-sm font-medium backdrop-blur-sm border border-primary/20"
+          >
+            <Sparkles className="h-4 w-4 inline-block mr-2" />
             Your AI Mental Health Companion
-          </span>
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">
+          </motion.div>
+          <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
             Take Control of Your Mental Wellbeing
           </h1>
           <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
@@ -69,27 +75,44 @@ const Index = () => {
           <div className="space-x-4">
             <Button 
               onClick={handleGetStarted}
-              className="slide-up px-8 py-6 text-lg bg-primary hover:bg-primary/90"
+              className="slide-up px-8 py-6 text-lg bg-primary hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all duration-300"
             >
               Get Started <ChevronRight className="ml-2 h-5 w-5" />
             </Button>
             <Button 
               onClick={() => navigate("/signin")}
               variant="outline"
-              className="slide-up px-8 py-6 text-lg"
+              className="slide-up px-8 py-6 text-lg backdrop-blur-sm bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-300"
             >
               Sign In
             </Button>
           </div>
         </motion.div>
+        
+        {/* Decorative elements */}
+        <div className="absolute -top-20 -left-20 w-64 h-64 bg-primary/10 rounded-full filter blur-3xl opacity-50"></div>
+        <div className="absolute -bottom-32 -right-20 w-80 h-80 bg-accent/10 rounded-full filter blur-3xl opacity-50"></div>
       </section>
 
       {/* Features Grid */}
-      <section className="container px-4 py-20">
+      <section className="container px-4 py-20 relative">
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-12"
+        >
+          <h2 className="text-3xl font-bold mb-4">Powerful Features</h2>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Everything you need to improve your mental wellbeing in one place
+          </p>
+        </motion.div>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.2, staggerChildren: 0.1 }}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
         >
           <FeatureCard
@@ -116,13 +139,14 @@ const Index = () => {
       </section>
 
       {/* Health Monitoring Section */}
-      <section className="container px-4 py-20 bg-card rounded-lg my-8">
-        <div className="max-w-4xl mx-auto">
+      <section className="container px-4 py-20 my-12">
+        <div className="max-w-4xl mx-auto glass-panel rounded-2xl p-10 backdrop-blur-md relative overflow-hidden">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="text-center mb-12"
+            className="text-center mb-12 relative z-10"
           >
             <h2 className="text-3xl font-bold mb-4">Comprehensive Health Tracking</h2>
             <p className="text-lg text-muted-foreground">
@@ -130,7 +154,7 @@ const Index = () => {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 relative z-10">
             <HealthFeatureCard
               icon={<Heart className="h-6 w-6 text-red-500" />}
               title="Heart Health"
@@ -147,6 +171,10 @@ const Index = () => {
               description="Track steps, calories, and daily movement"
             />
           </div>
+          
+          {/* Background gradient elements */}
+          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary/5 to-transparent opacity-60 z-0"></div>
+          <div className="absolute -bottom-20 -right-20 w-60 h-60 bg-primary/10 rounded-full filter blur-3xl opacity-30"></div>
         </div>
       </section>
 
@@ -154,47 +182,60 @@ const Index = () => {
       <section className="container px-4 py-20">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.6 }}
           className="text-center max-w-3xl mx-auto"
         >
-          <h2 className="text-3xl font-bold mb-6">Your Privacy & Security Matter</h2>
+          <h2 className="text-3xl font-bold mb-6 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Your Privacy & Security Matter</h2>
           <p className="text-lg text-muted-foreground mb-8">
             We use industry-standard encryption and security measures to protect your data. 
             Your health information is private and secure with us.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-            <div className="p-6">
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                className="rounded-full bg-primary/10 w-16 h-16 flex items-center justify-center mx-auto mb-4"
-              >
-                <Shield className="h-8 w-8 text-primary" />
-              </motion.div>
-              <h3 className="font-semibold mb-2">End-to-End Encryption</h3>
-              <p className="text-sm text-muted-foreground">Your data is encrypted at rest and in transit</p>
-            </div>
-            <div className="p-6">
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                className="rounded-full bg-primary/10 w-16 h-16 flex items-center justify-center mx-auto mb-4"
-              >
-                <Lock className="h-8 w-8 text-primary" />
-              </motion.div>
-              <h3 className="font-semibold mb-2">HIPAA Compliant</h3>
-              <p className="text-sm text-muted-foreground">Meeting healthcare privacy standards</p>
-            </div>
-            <div className="p-6">
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                className="rounded-full bg-primary/10 w-16 h-16 flex items-center justify-center mx-auto mb-4"
-              >
-                <UserCheck className="h-8 w-8 text-primary" />
-              </motion.div>
-              <h3 className="font-semibold mb-2">User Control</h3>
-              <p className="text-sm text-muted-foreground">Full control over your data sharing preferences</p>
-            </div>
+            <SecurityFeature 
+              icon={<Shield className="h-8 w-8 text-primary" />}
+              title="End-to-End Encryption"
+              description="Your data is encrypted at rest and in transit"
+            />
+            <SecurityFeature 
+              icon={<Lock className="h-8 w-8 text-primary" />}
+              title="HIPAA Compliant"
+              description="Meeting healthcare privacy standards"
+            />
+            <SecurityFeature 
+              icon={<UserCheck className="h-8 w-8 text-primary" />}
+              title="User Control"
+              description="Full control over your data sharing preferences"
+            />
           </div>
+        </motion.div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="container px-4 py-20 mb-10">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="bg-gradient-to-r from-primary/20 to-accent/20 backdrop-blur-md rounded-2xl p-12 text-center max-w-4xl mx-auto relative overflow-hidden"
+        >
+          <h2 className="text-3xl font-bold mb-4">Start Your Wellness Journey Today</h2>
+          <p className="text-lg mb-8 max-w-xl mx-auto">
+            Join thousands of users who have transformed their mental wellbeing with MindEase
+          </p>
+          <Button 
+            onClick={handleGetStarted}
+            size="lg" 
+            className="bg-primary hover:bg-primary/90 text-lg px-8 py-6 shadow-lg hover:shadow-xl transition-all duration-300"
+          >
+            Begin Your Journey <ArrowRight className="ml-2 h-5 w-5" />
+          </Button>
+          
+          {/* Decorative elements */}
+          <div className="absolute -top-10 -left-10 w-40 h-40 bg-primary/20 rounded-full filter blur-3xl"></div>
+          <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-accent/20 rounded-full filter blur-3xl"></div>
         </motion.div>
       </section>
     </div>
@@ -204,10 +245,10 @@ const Index = () => {
 const FeatureCard = ({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) => {
   return (
     <motion.div
-      whileHover={{ y: -5 }}
-      className="glass-panel p-6 rounded-lg"
+      whileHover={{ y: -5, boxShadow: "0 10px 30px -10px rgba(0,0,0,0.1)" }}
+      className="glass-panel p-6 rounded-xl border border-white/10 backdrop-blur-md shadow-lg hover:border-primary/20 transition-all duration-300"
     >
-      <div className="mb-4">{icon}</div>
+      <div className="mb-4 bg-primary/10 w-14 h-14 rounded-full flex items-center justify-center">{icon}</div>
       <h3 className="text-xl font-semibold mb-2">{title}</h3>
       <p className="text-muted-foreground">{description}</p>
     </motion.div>
@@ -218,11 +259,29 @@ const HealthFeatureCard = ({ icon, title, description }: { icon: React.ReactNode
   return (
     <motion.div
       whileHover={{ scale: 1.05 }}
-      className="bg-background p-6 rounded-lg shadow-lg"
+      className="bg-background/80 p-6 rounded-xl shadow-lg border border-white/10 backdrop-blur-sm transition-all duration-300"
     >
-      <div className="mb-4">{icon}</div>
+      <div className="mb-4 bg-white/10 w-12 h-12 rounded-full flex items-center justify-center">{icon}</div>
       <h3 className="text-xl font-semibold mb-2">{title}</h3>
       <p className="text-muted-foreground">{description}</p>
+    </motion.div>
+  );
+};
+
+const SecurityFeature = ({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) => {
+  return (
+    <motion.div
+      whileHover={{ y: -5 }}
+      className="p-6"
+    >
+      <motion.div
+        whileHover={{ scale: 1.05 }}
+        className="rounded-full bg-primary/10 w-16 h-16 flex items-center justify-center mx-auto mb-4 shadow-md"
+      >
+        {icon}
+      </motion.div>
+      <h3 className="font-semibold mb-2">{title}</h3>
+      <p className="text-sm text-muted-foreground">{description}</p>
     </motion.div>
   );
 };

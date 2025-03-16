@@ -44,7 +44,7 @@
 
 @layer components {
   .glass-panel {
-    @apply backdrop-blur-lg bg-white/80 border border-white/20 shadow-lg;
+    @apply backdrop-blur-lg bg-white/80 border border-white/20 shadow-lg transition-all;
   }
   
   .slide-up {
@@ -57,6 +57,26 @@
   
   .fade-in {
     @apply animate-fade-in;
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent;
+  }
+
+  .hover-card {
+    @apply transition-all duration-300 hover:shadow-lg hover:bg-white/10 hover:backdrop-blur-md;
+  }
+
+  .glass-card {
+    @apply bg-white/10 backdrop-blur-md rounded-xl border border-white/20 shadow-md hover:shadow-lg transition-all duration-300;
+  }
+
+  .neo-button {
+    @apply px-6 py-3 rounded-full bg-gradient-to-r from-primary to-accent text-white shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1;
+  }
+
+  .floating {
+    animation: floating 3s ease-in-out infinite;
   }
 }
 
@@ -74,6 +94,18 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes floating {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
   }
 }
 
