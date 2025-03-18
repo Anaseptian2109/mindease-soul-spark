@@ -1,6 +1,6 @@
 
 import { motion } from "framer-motion";
-import { ChevronRight, Heart, Brain, Moon, Activity, Loader2, Shield, Lock, UserCheck, Sparkles, ArrowRight, Dna, Microscope, Rocket } from "lucide-react";
+import { ChevronRight, Heart, Brain, Moon, Activity, Loader2, Shield, Lock, UserCheck, Sparkles, ArrowRight, Dna, Microscope, Rocket, MessageSquareCode, ScanFace, BrainCircuit, GitPullRequest, Gauge, HeartPulse, Key } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -95,7 +95,7 @@ const Index = () => {
         <div className="absolute -bottom-32 -right-20 w-80 h-80 bg-accent/10 rounded-full filter blur-3xl opacity-50"></div>
       </section>
 
-      {/* Features Grid */}
+      {/* Features Grid - Updated with more futuristic elements */}
       <section className="container px-4 py-20 relative">
         <motion.div
           initial={{ opacity: 0 }}
@@ -104,9 +104,9 @@ const Index = () => {
           transition={{ duration: 0.8 }}
           className="text-center mb-12"
         >
-          <h2 className="text-3xl font-bold mb-4">Powerful Features</h2>
+          <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Next-Gen Health Features</h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Everything you need to improve your mental wellbeing in one place
+            Cutting-edge technologies powered by advanced AI algorithms
           </p>
         </motion.div>
         <motion.div
@@ -116,25 +116,74 @@ const Index = () => {
           transition={{ duration: 0.6, delay: 0.2, staggerChildren: 0.1 }}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
         >
-          <FeatureCard
-            icon={<Brain className="h-8 w-8 text-primary" />}
+          <FuturisticFeatureCard
+            icon={<BrainCircuit className="h-8 w-8 text-purple-500" />}
             title="AI Emotional Support"
-            description="24/7 chat support powered by advanced AI for emotional guidance"
+            description="Neural-algorithmic companion providing personalized emotional optimization and real-time mental analysis"
+            gradient="from-purple-500 to-pink-500"
           />
-          <FeatureCard
-            icon={<Heart className="h-8 w-8 text-primary" />}
+          <FuturisticFeatureCard
+            icon={<Gauge className="h-8 w-8 text-pink-500" />}
             title="Mood Tracking"
-            description="Track and visualize your emotional wellbeing over time"
+            description="Quantum-enhanced emotional pattern recognition with predictive mood trajectory visualization"
+            gradient="from-pink-500 to-rose-500"
           />
-          <FeatureCard
-            icon={<Moon className="h-8 w-8 text-primary" />}
+          <FuturisticFeatureCard
+            icon={<Moon className="h-8 w-8 text-indigo-500" />}
             title="Guided Meditation"
-            description="AI-powered meditation sessions tailored to your needs"
+            description="Neuro-adaptive meditation protocols with real-time brainwave synchronization feedback"
+            gradient="from-indigo-500 to-blue-500"
           />
-          <FeatureCard
-            icon={<Activity className="h-8 w-8 text-primary" />}
+          <FuturisticFeatureCard
+            icon={<HeartPulse className="h-8 w-8 text-cyan-500" />}
             title="Health Monitoring"
-            description="Track vital signs and physical health metrics"
+            description="Continuous biometric surveillance with molecular-level health anomaly detection"
+            gradient="from-cyan-500 to-teal-500"
+          />
+        </motion.div>
+      </section>
+
+      {/* Digital Systems Section */}
+      <section className="container px-4 py-20 relative">
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-12"
+        >
+          <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Neural Digital Ecosystem</h2>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Seamlessly integrated digital systems with advanced neural network architecture
+          </p>
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.2, staggerChildren: 0.1 }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+        >
+          <HolographicFeatureCard
+            icon={<MessageSquareCode className="h-8 w-8 text-emerald-500" />}
+            title="Digital Journal"
+            description="Quantum-encrypted thought repository with AI-powered emotional pattern recognition and sentiment prediction"
+            gradient="from-emerald-500 to-green-500"
+            glowColor="emerald"
+          />
+          <HolographicFeatureCard
+            icon={<GitPullRequest className="h-8 w-8 text-amber-500" />}
+            title="Community Hub"
+            description="Secure neural-encrypted social matrix with quantum-resistant communication protocols and emotional resonance matching"
+            gradient="from-amber-500 to-orange-500"
+            glowColor="amber"
+          />
+          <HolographicFeatureCard
+            icon={<Shield className="h-8 w-8 text-rose-500" />}
+            title="Neural Security"
+            description="Military-grade neurological data protection with quantum-resistant encryption and biometric authentication layers"
+            gradient="from-rose-500 to-red-500"
+            glowColor="rose"
           />
         </motion.div>
       </section>
@@ -187,6 +236,110 @@ const Index = () => {
             accentColor="from-purple-500 to-fuchsia-500"
           />
         </div>
+      </section>
+
+      {/* Neural Interface Section */}
+      <section className="container px-4 py-20 relative overflow-hidden">
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-12 relative z-10"
+        >
+          <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Neural Interface Systems</h2>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Customize and optimize your neural pathways with our advanced interface technology
+          </p>
+        </motion.div>
+        
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="relative z-10"
+        >
+          <Card className="backdrop-blur-md bg-black/10 border-white/10 overflow-hidden">
+            <CardHeader className="pb-2">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center">
+                    <ScanFace className="h-8 w-8 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-2xl font-bold">Neural Interface</CardTitle>
+                    <CardDescription className="text-md">Customize and optimize your neural pathways and system preferences</CardDescription>
+                  </div>
+                </div>
+                <div className="bg-white/10 px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm">
+                  <span className="inline-block w-2 h-2 bg-green-500 rounded-full mr-2 pulse-glow"></span>
+                  Neural systems online
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                <motion.div 
+                  whileHover={{ y: -5 }}
+                  className="glass-panel p-4 rounded-xl border border-white/10 hover:border-primary/20"
+                >
+                  <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center mb-3">
+                    <Key className="h-5 w-5 text-cyan-400" />
+                  </div>
+                  <h3 className="text-lg font-medium mb-1">Neural Access</h3>
+                  <p className="text-sm text-muted-foreground">Quantum-protected biometric authorization protocols</p>
+                  <div className="h-1 w-full bg-gradient-to-r from-cyan-400 to-blue-500 opacity-50 mt-3 rounded-full"></div>
+                </motion.div>
+                
+                <motion.div 
+                  whileHover={{ y: -5 }}
+                  className="glass-panel p-4 rounded-xl border border-white/10 hover:border-primary/20"
+                >
+                  <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center mb-3">
+                    <BrainCircuit className="h-5 w-5 text-purple-400" />
+                  </div>
+                  <h3 className="text-lg font-medium mb-1">Mind-Machine Link</h3>
+                  <p className="text-sm text-muted-foreground">Advanced neural pathway optimization algorithms</p>
+                  <div className="h-1 w-full bg-gradient-to-r from-purple-400 to-pink-500 opacity-50 mt-3 rounded-full"></div>
+                </motion.div>
+                
+                <motion.div 
+                  whileHover={{ y: -5 }}
+                  className="glass-panel p-4 rounded-xl border border-white/10 hover:border-primary/20"
+                >
+                  <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center mb-3">
+                    <Activity className="h-5 w-5 text-green-400" />
+                  </div>
+                  <h3 className="text-lg font-medium mb-1">Synaptic Dashboard</h3>
+                  <p className="text-sm text-muted-foreground">Real-time neural performance monitoring system</p>
+                  <div className="h-1 w-full bg-gradient-to-r from-green-400 to-emerald-500 opacity-50 mt-3 rounded-full"></div>
+                </motion.div>
+              </div>
+              
+              <motion.div
+                initial={{ width: 0 }}
+                whileInView={{ width: "100%" }}
+                viewport={{ once: true }}
+                transition={{ duration: 1.5, delay: 0.5 }}
+                className="h-0.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 mt-8 opacity-70"
+              />
+              
+              <div className="flex justify-between items-center mt-4">
+                <div className="text-xs text-muted-foreground">Neural Matrix v4.2.7</div>
+                <Button 
+                  onClick={() => navigate("/dashboard")}
+                  className="slide-up bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white px-4 py-2 rounded-full shadow-lg transition-all duration-300"
+                >
+                  Access Neural Interface <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+        
+        {/* Background elements */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-gradient-to-br from-indigo-500/10 to-purple-500/5 blur-3xl"></div>
       </section>
 
       {/* Health Monitoring Section */}
@@ -293,15 +446,94 @@ const Index = () => {
   );
 };
 
-const FeatureCard = ({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) => {
+const FuturisticFeatureCard = ({ 
+  icon, 
+  title, 
+  description, 
+  gradient 
+}: { 
+  icon: React.ReactNode; 
+  title: string; 
+  description: string; 
+  gradient: string 
+}) => {
   return (
     <motion.div
-      whileHover={{ y: -5, boxShadow: "0 10px 30px -10px rgba(0,0,0,0.1)" }}
-      className="glass-panel p-6 rounded-xl border border-white/10 backdrop-blur-md shadow-lg hover:border-primary/20 transition-all duration-300"
+      whileHover={{ y: -8, scale: 1.02 }}
+      className="glass-panel p-6 rounded-xl border border-white/10 backdrop-blur-md shadow-lg transition-all duration-300 relative overflow-hidden"
     >
-      <div className="mb-4 bg-primary/10 w-14 h-14 rounded-full flex items-center justify-center">{icon}</div>
+      <div className="mb-4 bg-white/10 w-14 h-14 rounded-full flex items-center justify-center relative">
+        {icon}
+        <div className="absolute inset-0 rounded-full bg-gradient-to-r opacity-30"></div>
+      </div>
       <h3 className="text-xl font-semibold mb-2">{title}</h3>
       <p className="text-muted-foreground">{description}</p>
+      
+      <motion.div 
+        className={`absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r ${gradient} opacity-70`}
+        initial={{ scaleX: 0, originX: 0 }}
+        whileHover={{ scaleX: 1 }}
+        transition={{ duration: 0.3 }}
+      />
+      
+      <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-white/5 to-white/0 rounded-full transform translate-x-16 -translate-y-8"></div>
+    </motion.div>
+  );
+};
+
+const HolographicFeatureCard = ({ 
+  icon, 
+  title, 
+  description, 
+  gradient,
+  glowColor
+}: { 
+  icon: React.ReactNode; 
+  title: string; 
+  description: string; 
+  gradient: string;
+  glowColor: string;
+}) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      whileHover={{ y: -10, scale: 1.02 }}
+      className="glass-panel p-6 rounded-xl border border-white/10 backdrop-blur-md shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden"
+    >
+      <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-5`}></div>
+      
+      <div className={`mb-5 w-16 h-16 rounded-2xl bg-gradient-to-r ${gradient} bg-opacity-10 flex items-center justify-center relative`}>
+        <div className={`absolute inset-0 rounded-2xl ${glowColor}-pulse-glow`}></div>
+        {icon}
+      </div>
+      
+      <h3 className="text-xl font-bold mb-3 relative">{title}</h3>
+      <p className="text-muted-foreground relative z-10">{description}</p>
+      
+      <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-white/10 to-white/0 rounded-full transform translate-x-16 -translate-y-8"></div>
+      
+      <motion.div 
+        className={`mt-5 h-1 w-full bg-gradient-to-r ${gradient} opacity-50 rounded-full`}
+        initial={{ width: 0 }}
+        whileInView={{ width: "100%" }}
+        viewport={{ once: true }}
+        transition={{ duration: 1, delay: 0.3 }}
+      />
+      
+      <div className="flex justify-between items-center mt-4">
+        <div className="flex items-center">
+          <div className="w-2 h-2 rounded-full bg-green-500 pulse-glow mr-2"></div>
+          <span className="text-xs text-muted-foreground">Quantum Secured</span>
+        </div>
+        <motion.div
+          whileHover={{ scale: 1.1 }}
+          className="text-xs text-white px-2 py-1 rounded-full bg-gradient-to-r from-primary/70 to-accent/70 backdrop-blur-sm"
+        >
+          Explore
+        </motion.div>
+      </div>
     </motion.div>
   );
 };
