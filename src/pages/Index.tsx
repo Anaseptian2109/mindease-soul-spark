@@ -17,7 +17,7 @@ const Index = () => {
     // Simulate loading state
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 1000);
+    }, 3000);
 
     return () => clearTimeout(timer);
   }, []);
