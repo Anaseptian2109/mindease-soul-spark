@@ -1,7 +1,42 @@
 
 import { motion } from "framer-motion";
 import { Sparkles, Dna, Microscope, Rocket } from "lucide-react";
-import { AdvancedFeatureCard } from "./AdvancedFeatureCard";
+
+// Karena kita tidak bisa memodifikasi AdvancedFeatureCard, kita buat versi sederhana
+// untuk menggantikan sementara
+
+const SimpleAdvancedFeatureCard = ({ 
+  icon, 
+  title, 
+  description, 
+  comingSoon = false,
+  accentColor 
+}) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      whileHover={{ y: -10, scale: 1.02 }}
+      className="glass-panel p-6 rounded-xl border border-white/10 backdrop-blur-md shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden"
+    >
+      <div className={`absolute inset-0 bg-gradient-to-br ${accentColor} opacity-5`}></div>
+      
+      <div className="mb-5 w-16 h-16 rounded-2xl bg-white/10 flex items-center justify-center relative">
+        {icon}
+      </div>
+      
+      <h3 className="text-xl font-bold mb-3 relative">{title}</h3>
+      <p className="text-muted-foreground relative z-10">{description}</p>
+      
+      {comingSoon && (
+        <div className="mt-4 px-3 py-1 bg-primary/20 text-primary text-xs font-medium inline-block rounded-full">
+          Coming Soon
+        </div>
+      )}
+    </motion.div>
+  );
+};
 
 export const AdvancedTechnologiesSection = () => {
   return (
@@ -30,21 +65,21 @@ export const AdvancedTechnologiesSection = () => {
       </motion.div>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <AdvancedFeatureCard
+        <SimpleAdvancedFeatureCard
           icon={<Dna className="h-10 w-10 text-emerald-500" />}
           title="Genetic Analysis"
           description="Advanced DNA sequencing and personalized genetic health insights"
           comingSoon={false}
           accentColor="from-green-500 to-emerald-500"
         />
-        <AdvancedFeatureCard
+        <SimpleAdvancedFeatureCard
           icon={<Microscope className="h-10 w-10 text-cyan-500" />}
           title="Cellular Optimization"
           description="Microscopic health assessment and cellular rejuvenation protocols"
           comingSoon={true}
           accentColor="from-blue-500 to-cyan-500"
         />
-        <AdvancedFeatureCard
+        <SimpleAdvancedFeatureCard
           icon={<Rocket className="h-10 w-10 text-fuchsia-500" />}
           title="Quantum Health Matrix"
           description="Experimental quantum computing analysis for health prediction"
