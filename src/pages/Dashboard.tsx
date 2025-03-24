@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { 
@@ -26,6 +25,7 @@ import { useState, useEffect } from "react";
 import { HealthStatus } from "@/components/HealthStatus";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { AISuperDoctor } from "@/components/AISuperDoctor";
 
 const FeatureCard = ({ 
   title, 
@@ -129,6 +129,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
+  const [showAIChat, setShowAIChat] = useState(false);
   const [quickStats, setQuickStats] = useState({
     mentalHealth: 85,
     physicalHealth: 72,
@@ -158,7 +159,6 @@ const Dashboard = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      // Update stats randomly for a dynamic feel
       setQuickStats(prev => ({
         mentalHealth: Math.max(70, Math.min(99, prev.mentalHealth + (Math.random() > 0.5 ? 1 : -1))),
         physicalHealth: Math.max(65, Math.min(90, prev.physicalHealth + (Math.random() > 0.6 ? 1 : -1))),
@@ -284,6 +284,15 @@ const Dashboard = () => {
         description: "All systems functioning within optimal parameters",
       });
     }, 2500);
+  };
+
+  const handleOpenChat = () => {
+    setShowAIChat(true);
+    toast({
+      title: "AI Medical Consultant Activated",
+      description: "Your virtual doctor is ready to assist you",
+    });
+    navigate("/chatbot");
   };
 
   if (isLoading) {
@@ -483,6 +492,8 @@ const Dashboard = () => {
             />
           </motion.div>
         </div>
+
+        <AISuperDoctor onOpenChat={handleOpenChat} />
 
         <motion.div 
           variants={containerVariants}
